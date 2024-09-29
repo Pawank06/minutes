@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import { prisma } from "@/lib/prismaClient";
@@ -32,18 +31,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     signIn: async ({ user, account }) => {
       try {
-        const { email, name, image } = user;
-        // console.log(user);
+        console.log("SignIn callback started", { user, account });
 
-        // Only for OAuth providers (Google in this case)
+        const { email, name, image } = user;
+
         if (account?.provider === "google") {
+          console.log("Google provider detected");
+
           const existingUser = await prisma.user.findUnique({
             where: { email: email as string },
           });
 
+          console.log("Existing user check", { existingUser });
+
           if (!existingUser) {
+            console.log("Creating new user");
             try {
-              await prisma.user.create({
+              const newUser = await prisma.user.create({
                 data: {
                   email: email as string,
                   username: name as string,
@@ -51,17 +55,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                   authProviderId: account.id as string,
                 },
               });
+              console.log("New user created", { newUser });
             } catch (error) {
-              console.error(`Error creating user: ${email}`, error);
+              console.error("Error creating user", { email, error });
               return false;
             }
           }
         }
-        return true; // Allow sign-in for both OAuth and credentials
+
+        console.log("SignIn callback completed successfully");
+        return true;
       } catch (error: any) {
-        throw new Error("Error while creating user", error.message);
+        console.error("SignIn callback error", { error });
+        throw new Error("Error during sign in: " + error.message);
       }
     },
   },
-  
 });
