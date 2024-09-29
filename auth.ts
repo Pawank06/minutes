@@ -52,7 +52,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 },
               });
             } catch (error) {
-              console.log(`Error creating user ${error}`);
+              console.error(`Error creating user: ${email}`, error);
+              return false;
             }
           }
         }
@@ -62,4 +63,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
     },
   },
+  
 });
