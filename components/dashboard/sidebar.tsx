@@ -19,10 +19,10 @@ const Sidebar = () => {
             setIsLargeScreen(largeScreen);
             setIsOpen(largeScreen);
         };
-    
+
         handleResize();
         window.addEventListener('resize', handleResize);
-    
+
         return () => window.removeEventListener('resize', handleResize);
     }, []); // No extra dependencies needed
 
@@ -39,6 +39,7 @@ const Sidebar = () => {
                 }
                 const formData = await response.json();
                 setSessions(formData);
+                // console.log(formData)
             } catch (error) {
                 console.error('Error fetching sessions:', error);
             }
@@ -58,23 +59,23 @@ const Sidebar = () => {
         setIsOpen(!isOpen);
     };
 
-    const filteredSessions = isUpcoming 
+    const filteredSessions = isUpcoming
         ? sessions.filter(session => new Date(session.date) >= new Date()) // Upcoming sessions
         : sessions.filter(session => new Date(session.date) < new Date()); // Past sessions
 
     return (
         <>
-            <motion.div 
+            <motion.div
                 className={`fixed lg:static top-0 left-0 h-full bg-white overflow-y-auto`}
                 initial={{ width: 0, filter: 'blur(10px)' }}
                 animate={{ width: isLargeScreen ? '500px' : isOpen ? '100%' : '0', filter: 'blur(0px)' }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }} // Super fast animation
+                transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
                 <motion.div
                     className="p-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ duration: 0.2, delay: 0.1 }} // Slight delay to sync with sidebar animation
+                    transition={{ duration: 0.2, delay: 0.1 }}
                 >
                     <div className="mb-10 flex justify-between items-center">
                         <Link href="/">
@@ -84,10 +85,10 @@ const Sidebar = () => {
                     </div>
                     <div className='flex mb-5 items-center justify-between'>
                         <h3 className='text-xl font-medium'>My Sessions</h3>
-                        <Link href="/create"> 
-                        <Button className='rounded-full flex gap-1 items-center'>
-                            <Plus className='w-4 h-4' /> Create 
-                        </Button>
+                        <Link href="/create">
+                            <Button className='rounded-full flex gap-1 items-center'>
+                                <Plus className='w-4 h-4' /> Create
+                            </Button>
                         </Link>
                     </div>
                     <div className="mb-5">
@@ -101,14 +102,14 @@ const Sidebar = () => {
                         </div>
                     </div>
                     <div className="flex justify-between mb-5 text-sm">
-                        <button 
-                            className={`flex-1 rounded-full py-3 ${isUpcoming ? 'bg-stone-100' : ''}`} 
+                        <button
+                            className={`flex-1 rounded-full py-3 ${isUpcoming ? 'bg-stone-100' : ''}`}
                             onClick={() => setIsUpcoming(true)} // Set to upcoming
                         >
-                            Upcoming <span className='ml-2 rounded-full border px-2 py-1 bg-yellow-200 shadow-inner'>{sessions.filter(session => new Date(session.date) >= new Date()).length}</span> 
+                            Upcoming <span className='ml-2 rounded-full border px-2 py-1 bg-yellow-200 shadow-inner'>{sessions.filter(session => new Date(session.date) >= new Date()).length}</span>
                         </button>
-                        <button 
-                            className={`flex-1 rounded-full py-3 ${!isUpcoming ? 'bg-stone-100' : ''}`} 
+                        <button
+                            className={`flex-1 rounded-full py-3 ${!isUpcoming ? 'bg-stone-100' : ''}`}
                             onClick={() => setIsUpcoming(false)} // Set to past
                         >
                             Past <span className='ml-2 rounded-full border px-2 py-1 bg-green-200 {sessions.filter(session => new Date(session.date) >= new Date()).length}'>{sessions.filter(session => new Date(session.date) <= new Date()).length}</span>
@@ -117,25 +118,28 @@ const Sidebar = () => {
                     <div className="mt-5">
                         <div className="text-sm text-gray-500 mb-2">Select a session</div>
                         {
-                            filteredSessions.map((session) => (
-                                <div 
-                                    key={session._id} 
-                                    className={`flex items-center p-2 rounded-full mb-2 cursor-pointer ${
-                                        selectedSession && selectedSession._id === session._id
-                                            ? 'bg-stone-100'
-                                            : ' hover:bg-stone-200'
-                                    }`}
-                                    onClick={() => handleSessionClick(session)}
-                                >
-                                    <div className="text-lg bg-white font-medium mr-3 rounded-full border px-3 py-2">
-                                        {String(new Date(session.date).getDate()).padStart(2, '0')}
+                            filteredSessions.map((session) => {
+                                // console.log(session)
+                                return (
+
+                                    <div
+                                        key={session.id}
+                                        className={`flex items-center p-2 rounded-full mb-2 cursor-pointer ${selectedSession && selectedSession.id === session.id
+                                                ? 'bg-stone-100'
+                                                : ' hover:bg-stone-200'
+                                            }`}
+                                        onClick={() => handleSessionClick(session)}
+                                    >
+                                        <div className="text-lg bg-white font-medium mr-3 rounded-full border px-3 py-2">
+                                            {String(new Date(session.date).getDate()).padStart(2, '0')}
+                                        </div>
+                                        <div>
+                                            <div className="font-medium">{session.organizationName}</div>
+                                            <div className="text-sm text-gray-500 line-clamp-1">{session.description}</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div className="font-medium">{session.organizationName}</div>
-                                        <div className="text-sm text-gray-500 line-clamp-1">{session.description}</div>
-                                    </div>
-                                </div>
-                            ))
+                                )
+                            })
                         }
                     </div>
                 </motion.div>

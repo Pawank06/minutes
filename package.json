@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^5.20.0",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@solana/actions": "^1.6.4",
@@ -21,7 +22,8 @@
     "clsx": "^2.1.1",
     "framer-motion": "^11.5.6",
     "lucide-react": "^0.445.0",
-    "mongoose": "^8.6.3",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.7.0",
     "next": "14.2.13",
     "next-auth": "^5.0.0-beta.21",
     "nodemailer": "^6.9.15",
@@ -40,6 +42,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "postcss": "^8",
+    "prisma": "^5.20.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

@@ -1,10 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import NextAuth from "next-auth";
-
-
 import Google from "next-auth/providers/google";
-import { User } from "@/db/models/userSchema";
-import connectDB from "@/db/connectdb";
+import { prisma } from "@/lib/prismaClient";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -15,48 +13,53 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
 
   pages: {
-    signIn: "/auth/signin"
+    signIn: "/auth/signin",
   },
 
   callbacks: {
-    async session({session, token}) {
-      if(token?.sub) {
+    async session({ session, token }) {
+      if (token?.sub) {
         session.user.id = token.sub;
       }
       return session;
     },
-    async jwt({token, user}) {
-      if(user) {
-        token.id = user.id
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
       }
-      return token
+      return token;
     },
 
     signIn: async ({ user, account }) => {
       try {
         const { email, name, image } = user;
-    
+        // console.log(user);
+
         // Only for OAuth providers (Google in this case)
         if (account?.provider === "google") {
-          await connectDB();
-          const existingUser = await User.findOne({ email });
-    
+          const existingUser = await prisma.user.findUnique({
+            where: { email: email as string },
+          });
+
           if (!existingUser) {
-            await User.create({
-              email,
-              username: name,
-              image,
-              authProviderId: account.id, 
-            });
+            try {
+              await prisma.user.create({
+                data: {
+                  email: email as string,
+                  username: name as string,
+                  image: image as string,
+                  authProviderId: account.id as string,
+                },
+              });
+            } catch (error) {
+              console.log(`Error creating user ${error}`);
+            }
           }
         }
         return true; // Allow sign-in for both OAuth and credentials
-      } catch (error) {
-        throw new Error("Error while creating user");
+      } catch (error: any) {
+        throw new Error("Error while creating user", error.message);
       }
     },
-    
-
-
-  }
+  },
 });

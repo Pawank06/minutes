@@ -42,7 +42,7 @@ const Containers = () => {
   
         // Type check to ensure that we are dealing with complete Buyer objects
         const completeBuyers: Buyer[] = formData
-          .filter((data: { creatorId: string; _id: string }) => data.creatorId === selectedSession?._id)
+          .filter((data: { creatorId: string; id: string }) => data.creatorId === selectedSession?.id)
           .map((data: { creatorId: string; _id: string }) => {
             // Map incomplete data to Buyer type with default values
             const buyer: Buyer = {

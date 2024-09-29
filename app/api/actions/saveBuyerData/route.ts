@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import connectDB from "@/db/connectdb";
-import { Buyer } from "@/db/models/buyerSchema";
-import { Slot } from "@/db/models/createSlotSchema";
+import { prisma } from "@/lib/prismaClient";
 
 import {
   createActionHeaders,
@@ -14,6 +12,7 @@ import {
 } from "@solana/actions";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
 import nodemailer from "nodemailer";
+import { Time } from "../../create/route";
 
 const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 
@@ -37,7 +36,6 @@ export const GET = async () => {
 export const OPTIONS = GET;
 
 export const POST = async (req: Request) => {
-  await connectDB();
   try {
     const body: NextActionPostRequest = await req.json();
     const url = new URL(req.url);
@@ -45,7 +43,6 @@ export const POST = async (req: Request) => {
     const buyerName = url.searchParams.get("buyerName") ?? "";
     const buyerEmail = url.searchParams.get("buyerEmail") ?? "";
     const timeType = url.searchParams.get("timeType") ?? "";
-
 
     let signature: string;
     try {
@@ -75,21 +72,25 @@ export const POST = async (req: Request) => {
         }
       }
 
-      const creatorDetails = await Slot.findById(creatorId);
-      
-      const newcreatorId = creatorDetails.creatorId;
-
-      const newBlink = new Buyer({
-        email: buyerEmail,
-        buyername: buyerName,
-        timeslot: timeType,
-        creatorId,
+      const creatorDetails = await prisma.slot.findFirst({
+        where: { id: creatorId },
       });
 
-      await newBlink.save();
+      if (!creatorDetails) throw new Error("Slot Empty!");
 
-      creatorDetails.earnings = creatorDetails.earnings + creatorDetails.amount;
+      const newcreatorId = creatorDetails.creatorId;
 
+      const newBlink = await prisma.buyer.create({
+        data: {
+          email: buyerEmail,
+          buyername: buyerName,
+          timeslot: timeType,
+          creatorId,
+        },
+      });
+
+      creatorDetails.earnings =
+        Number(creatorDetails.earnings) + Number(creatorDetails.amount);
 
       // Update the corresponding time slot to null
       if (timeType === creatorDetails.time1) {
@@ -100,14 +101,24 @@ export const POST = async (req: Request) => {
         creatorDetails.time3 = "booked";
       }
 
-      await creatorDetails.save();
+      // console.log(creatorDetails)
 
+      await prisma.slot.update({
+        where: { id: creatorDetails.id }, // or newBlink.creatorId if needed
+        data: {
+          earnings: creatorDetails.earnings,  // Only updating specific fields
+          time1: creatorDetails.time1,
+          time2: creatorDetails.time2,
+          time3: creatorDetails.time3,
+          // You can add other fields that you want to update here
+        },
+      });
+      
 
       const transaction = await connection.getParsedTransaction(
         signature,
         "confirmed"
       );
-      
 
       const payload: CompletedAction = {
         type: "completed",
@@ -116,8 +127,6 @@ export const POST = async (req: Request) => {
         label: "Time Slot Purchased",
         description: `You have successfully booked the ${timeType} slot with ${creatorDetails.organizationName}.`,
       };
-
-      
 
       // Send an email notification to the user
       // Send an email notification to the user
@@ -166,17 +175,17 @@ Support: groww3809@gmail.com
 
 // Function to convert 24-hour time to 12-hour format
 function convertTo12Hour(time24: any) {
-    // Split the time string into hours and minutes
-    const [hours, minutes] = time24.split(':');
+  // Split the time string into hours and minutes
+  const [hours, minutes] = time24.split(":");
 
-    // Determine AM or PM
-    const suffix = hours >= 12 ? 'PM' : 'AM';
+  // Determine AM or PM
+  const suffix = hours >= 12 ? "PM" : "AM";
 
-    // Adjust hours for 12-hour format, ensuring '0' hours becomes '12'
-    const adjustedHours = (hours % 12) || 12;  // Converts '0' to '12'
-    
-    // Return the formatted time
-    return `${adjustedHours}:${minutes} ${suffix}`;
+  // Adjust hours for 12-hour format, ensuring '0' hours becomes '12'
+  const adjustedHours = hours % 12 || 12; // Converts '0' to '12'
+
+  // Return the formatted time
+  return `${adjustedHours}:${minutes} ${suffix}`;
 }
 
 // Example timeType string (ensure this is in HH:mm format)

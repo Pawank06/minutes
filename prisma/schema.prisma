@@ -1,0 +1,55 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  username       String   @unique
+  email          String   @unique
+  password       String?
+  image          String?
+  authProviderId String?
+  slots          Slot[]
+  buyers         Buyer[]  @relation("UserBuyers")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Slot {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  timeId           String   @unique
+  title            String
+  creator          User     @relation(fields: [creatorId], references: [id])
+  creatorId        String   @db.ObjectId
+  creatorPublicKey String
+  organizationName String
+  email            String   @map("email") @db.String
+  image            String
+  description      String
+  amount           Float?
+  earnings         Float    @default(0.0)
+  date             String?
+  time1            String
+  time2            String
+  time3            String
+  meetlink         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Buyer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  buyername String
+  email     String
+  timeslot  String
+  creator   User     @relation("UserBuyers", fields: [creatorId], references: [id])
+  creatorId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

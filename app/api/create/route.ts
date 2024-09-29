@@ -1,14 +1,30 @@
 import { NextResponse } from "next/server";
-import connectDB from "@/db/connectdb";
-import { Slot } from "@/db/models/createSlotSchema";
 import { v4 as uuidv4 } from "uuid";
 import { getSession } from "@/lib/getSession";
-import { User } from "@/db/models/userSchema";
+import { prisma } from "@/lib/prismaClient";
 import cloudinary from "@/lib/cloundinary";
+
+export interface Time {
+  id: string;
+  creatorId: string;
+  timeId: string;
+  organizationName: string;
+  title: string;
+  creatorPublicKey: string;
+  email: string;
+  image: string;
+  description: string;
+  amount: number;
+  date: string;
+  time1: string;
+  time2: string;
+  time3: string;
+  meetlink: string;
+}
 
 export async function POST(req: Request) {
   const session = await getSession();
-  console.log("Session", session?.user?.email);
+  // console.log("Session", session?.user?.email);
   const email = session?.user?.email;
 
   if (!email) {
@@ -20,15 +36,14 @@ export async function POST(req: Request) {
 
   let userId;
   try {
-    await connectDB();
-    const user = await User.findOne({ email });
+    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
       );
     }
-    userId = user._id;
+    userId = user.id;
   } catch (error) {
     console.error("Error finding user:", error);
     return NextResponse.json(
@@ -39,7 +54,7 @@ export async function POST(req: Request) {
 
   try {
     const formData = await req.formData();
-    console.log("FORMDATA", formData)
+    // console.log("FORMDATA", formData);
 
     const imageFile = formData.get("image") as File;
     let imageUrl = "";
@@ -74,7 +89,7 @@ export async function POST(req: Request) {
       meetlink: formData.get("meetlink")?.toString().trim(),
     };
 
-    console.log("Time Slot", timeSlotData)
+    // console.log("Time Slot", timeSlotData);
 
     // Validate required fields
     const requiredFields = [
@@ -98,7 +113,6 @@ export async function POST(req: Request) {
         );
       }
     }
-    
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -117,30 +131,53 @@ export async function POST(req: Request) {
       );
     }
 
-    const newTimeSlot = new Slot(timeSlotData);
-    console.log("New Time Slot before save:", newTimeSlot);
-    await newTimeSlot.save();
-    console.log("New Time Slot after save:", newTimeSlot);
+    const oldUser = await prisma.user.findUnique({ where: { id: userId } });
+    console.log(oldUser)
+
+    console.log("========");
+
+    // const newTimeSlot = await prisma.slot.update({
+    //   where: { timeId: timeSlotData.timeId }, // Use timeId (or id if available)
+    //   data: timeSlotData,
+    // });
+
+    console.log("========");
+    const newTimeSlot = await prisma.slot.create({
+      data: timeSlotData as Time,
+    });
+    // console.log("New Time Slot before save:", newTimeSlot);
+    // await prisma.slot.update(newTimeSlot);
+    // console.log("New Time Slot after save:", newTimeSlot);
 
     // Find the user again to ensure we have the most up-to-date data
-    const userBeforeUpdate = await User.findById(userId);
+    const userBeforeUpdate = await prisma.user.findUnique({
+      where: { id: userId },
+    });
     console.log(
       "User before update:",
       JSON.stringify(userBeforeUpdate, null, 2)
     );
 
     // Add the new slot to the user's document
-    const user = await User.findById(userId);
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new Error("User not found");
     }
-    user.slots.push(newTimeSlot._id);
-    await user.save();
+
+    // new user.slots.push(newTimeSlot.id);
+    // await prisma.slot.update({
+    //   where: { id: user.id },
+    //   data: {
+    //     slots: newTimeSlot.timeId as string,
+    //   },
+    // }); // not sure need to check this one!
 
     console.log("Updated User:", JSON.stringify(user, null, 2));
 
     // Verify the update
-    const userAfterUpdate = await User.findById(userId);
+    const userAfterUpdate = await prisma.user.findUnique({
+      where: { id: userId },
+    });
     console.log("User after update:", JSON.stringify(userAfterUpdate, null, 2));
 
     return NextResponse.json(

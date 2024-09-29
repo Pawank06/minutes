@@ -109,7 +109,8 @@ const TimeSlotForm: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setBlinkId(data.data._id)
+        setBlinkId(data.data.id)
+        // console.log(data.data.id)
         nextStep()
         
         

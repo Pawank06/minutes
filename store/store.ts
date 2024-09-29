@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export interface Session {
-    _id: string;
+    id: string;
     organizationName: string;
     date: string;
     price: number;
