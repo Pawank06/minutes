@@ -49,7 +49,7 @@ const TimeSlotForm: React.FC = () => {
   const controls = useAnimation();
 
   const handleCopy = () => {
-    const linkToCopy = `http://localhost:3000/join/${blinkId}`;
+    const linkToCopy = `https://www.minutess.xyz/${blinkId}`;
     navigator.clipboard.writeText(linkToCopy).then(() => {
       setCopied(true);
       setIcon(<CheckCircle className="text-green-500" />); // Change icon to checkmark icon
@@ -314,7 +314,7 @@ const TimeSlotForm: React.FC = () => {
               <h1 className="text-xl font-medium flex items-center gap-1">Here is your blink share it on <FaXTwitter/></h1>
               
               <div className="px-3 py-2 mt-2 border rounded-lg bg-stone-200 flex items-center justify-between">
-                <p>{process.env.BASE_URL}/{blinkId}</p>
+                <p>https://www.minutess.xyz/{blinkId}</p>
                 <div onClick={handleCopy} className="cursor-pointer">
                   <motion.div animate={controls}>
                     {icon} {/* Display the current icon */}
