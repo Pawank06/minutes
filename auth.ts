@@ -42,6 +42,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const { email, name, image } = user;
 
+        if (!email) {
+          throw new Error("Email is required for authentication");
+        }
+
         if (account?.provider === "google") {
           console.log("Google provider detected");
 
