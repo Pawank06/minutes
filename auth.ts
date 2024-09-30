@@ -49,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (account?.provider === "google") {
           console.log("Google provider detected");
 
-          const existingUser = await prisma.user.findUnique({
+          const existingUser = await prisma.user.findFirst({
             where: { email: email as string },
           });
 
