@@ -131,7 +131,7 @@ export const POST = async (req: Request) => {
       // Send an email notification to the user
       // Send an email notification to the user
       await transporter.sendMail({
-        from: `"Minutes" <${process.env.EMAIL}>`,
+        from: `"Minutess" <${process.env.EMAIL}>`,
         to: buyerEmail,
         subject: `Confirmation: Time Slot Successfully Purchased`,
         text: `Hi ${buyerName},
@@ -146,9 +146,9 @@ Meeting Link: ${creatorDetails.meetlink}
 You’ll receive regular updates and exclusive content for the project via this email. If you have any questions or need further assistance, feel free to contact us at any time.
 
 Best regards,
-The Minutes Team
+The Minutess Team
 
-SUBSLINK - Monetize Your Time
+Minutess - Monetize Your Time
 Website: ${process.env.BASE_URL}
 Support: groww3809@gmail.com
 `,
