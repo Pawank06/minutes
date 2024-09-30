@@ -23,7 +23,7 @@ const Header = async() => {
                     <Link href="/auth/signin">
                         Login
                     </Link>
-                    <Link href="/auth/sigin">
+                    <Link href="/auth/signin">
                     <Button className='rounded-full uppercase font-medium text-sm'>
                         Sign up
                     </Button>
