@@ -128,6 +128,8 @@ export const POST = async (req: Request) => {
         description: `You have successfully booked the ${timeType} slot with ${creatorDetails.organizationName}.`,
       };
 
+      const formattedTime = convertTo12Hour(timeType);
+
       // Send an email notification to the user
       // Send an email notification to the user
       await transporter.sendMail({
@@ -188,8 +190,7 @@ function convertTo12Hour(time24: any) {
   return `${adjustedHours}:${minutes} ${suffix}`;
 }
 
-// Example timeType string (ensure this is in HH:mm format)
-const timeType = "15:00"; // or whatever string you're receiving
+// Example timeType string (ensure this is in HH:mm format) // or whatever string you're receiving
 
 // Convert the timeType to 12-hour format
-const formattedTime = convertTo12Hour(timeType);
+
