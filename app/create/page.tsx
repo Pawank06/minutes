@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Copy, CheckCircle } from "lucide-react"; // Import CheckCircle icon
+import { ArrowLeft, Copy, CheckCircle, Loader } from "lucide-react"; // Import CheckCircle icon
 import React, { useState } from "react";
 import { useRouter } from 'next/navigation'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -39,6 +39,8 @@ const TimeSlotForm: React.FC = () => {
     meetlink: "",
     title: ""
   });
+
+  const [loader, setLoader] =  useState(false)
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -91,7 +93,7 @@ const TimeSlotForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setLoader(true)
     const formDataToSend = new FormData();
     for (const key in formData) {
       if (key === 'image' && formData[key]) {
@@ -107,7 +109,10 @@ const TimeSlotForm: React.FC = () => {
         body: formDataToSend,
       });
 
+
+
       if (response.ok) {
+        setLoader(false)
         const data = await response.json();
         setBlinkId(data.data.id)
         // console.log(data.data.id)
@@ -338,8 +343,10 @@ const TimeSlotForm: React.FC = () => {
               </Button>
             )}
             {currentStep === 3 && (
-              <Button type="submit" className="rounded-full">
-                Create blink
+              <Button type="submit" className="rounded-full flex items-center gap-2">
+               {
+                loader && <Loader className="animate-spin" />
+               } Create blink
               </Button>
             )}
 
