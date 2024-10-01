@@ -169,7 +169,12 @@ const Containers = () => {
             </div>
 
             <div className="mt-10">
-              <h1 className="text-xl">Monday September 23, 2024</h1>
+              <h1 className="text-xl">{new Date(selectedSession.date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}</h1>
               <p className="text-muted-foreground">30 min @zoom</p>
               <div className="mt-5">
                 {buyer.map((b: Buyer) => (

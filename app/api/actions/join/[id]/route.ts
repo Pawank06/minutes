@@ -35,7 +35,7 @@ export const GET = async (req: Request) => {
     const payload: ActionGetResponse = {
       icon: String(creatorDetails?.image),
       title: `Buy ${String(creatorDetails?.organizationName)}'s Time`,
-      description: `${String(creatorDetails?.description)}`,
+      description: `${String(creatorDetails?.description)} Date: ${creatorDetails?.date}`,
       label: "Buy Time",
       links: {
         actions: [
