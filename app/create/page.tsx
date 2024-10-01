@@ -143,7 +143,7 @@ const TimeSlotForm: React.FC = () => {
 
           {currentStep !== 4 && (<>
           <h1 className="text-3xl font-bold mb-3">Create Your Session Blink</h1>
-          <p className="text-sm text-muted-foreground">Provide the details below to create a session blink that you can share with your audience.</p> 
+          <p className="text-sm text-muted-foreground">Provide all the details below to create a session blink that you can share with your audience. <span className="text-red-500"> otherwise it won&apos;t work. Gonna add zod soon</span></p> 
           </> )}
 
         </div>
