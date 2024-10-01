@@ -263,7 +263,7 @@ const TimeSlotForm: React.FC = () => {
                 <input
                   type="time"
                   name="time1"
-                  value={formData.time1 || "00:00"}
+                  value={formData.time1}
                   onChange={handleInputChange}
                   className="p-3 bg-stone-50 border border-stone-200 rounded-md"
                   required
@@ -275,7 +275,7 @@ const TimeSlotForm: React.FC = () => {
                 <input
                   type="time"
                   name="time2"
-                  value={formData.time2 || "00:00"}
+                  value={formData.time2}
                   onChange={handleInputChange}
                   className="p-3 bg-stone-50 border border-stone-200 rounded-md"
                   required
@@ -287,7 +287,7 @@ const TimeSlotForm: React.FC = () => {
                 <input
                   type="time"
                   name="time3"
-                  value={formData.time3 || "00:00"}
+                  value={formData.time3}
                   onChange={handleInputChange}
                   className="p-3 bg-stone-50 border border-stone-200 rounded-md"
                   required
