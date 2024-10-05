@@ -52,7 +52,14 @@ Follow these steps to set up the project on your local machine:
    ```sh
     npm i
     ```
-4. **Starting the server**
+4. **Start the database**
+
+    ```sh
+    docker-compose up -d
+    ```
+    Add the database url to the ```.env``` file: ```"mongodb://root:example@localhost:27017/minutes?authSource=admin"```
+
+5. **Starting the server**
 
    ```sh
     npm run dev
