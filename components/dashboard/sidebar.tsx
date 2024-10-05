@@ -59,9 +59,17 @@ const Sidebar = () => {
         setIsOpen(!isOpen);
     };
 
-    const filteredSessions = isUpcoming
-        ? sessions.filter(session => new Date(session.date) >= new Date()) // Upcoming sessions
-        : sessions.filter(session => new Date(session.date) < new Date()); // Past sessions
+    const filteredSessions = sessions.filter(session => {
+        const sessionDate = new Date(session.date);
+        const today = new Date();
+        
+        // Compare only the date part, ignoring the time
+        today.setHours(0, 0, 0, 0);
+        sessionDate.setHours(0, 0, 0, 0);
+        
+        return isUpcoming ? sessionDate >= today : sessionDate < today;
+    });
+    
 
     return (
         <>
@@ -106,13 +114,25 @@ const Sidebar = () => {
                             className={`flex-1 rounded-full py-3 ${isUpcoming ? 'bg-stone-100' : ''}`}
                             onClick={() => setIsUpcoming(true)} // Set to upcoming
                         >
-                            Upcoming <span className='ml-2 rounded-full border px-2 py-1 bg-yellow-200 shadow-inner'>{sessions.filter(session => new Date(session.date) >= new Date()).length}</span>
+                            Upcoming <span className='ml-2 rounded-full border px-2 py-1 bg-yellow-200 shadow-inner'>{sessions.filter(session => {
+            const sessionDate = new Date(session.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Ignore the time part
+            sessionDate.setHours(0, 0, 0, 0); // Ignore the time part
+            return sessionDate >= today; // Upcoming sessions are today or in the future
+        }).length}</span>
                         </button>
                         <button
                             className={`flex-1 rounded-full py-3 ${!isUpcoming ? 'bg-stone-100' : ''}`}
                             onClick={() => setIsUpcoming(false)} // Set to past
                         >
-                            Past <span className='ml-2 rounded-full border px-2 py-1 bg-green-200 {sessions.filter(session => new Date(session.date) >= new Date()).length}'>{sessions.filter(session => new Date(session.date) <= new Date()).length}</span>
+                            Past <span className='ml-2 rounded-full border px-2 py-1 bg-green-200 {sessions.filter(session => new Date(session.date) >= new Date()).length}'>{sessions.filter(session => {
+            const sessionDate = new Date(session.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Ignore the time part
+            sessionDate.setHours(0, 0, 0, 0); // Ignore the time part
+            return sessionDate < today; // Past sessions are before today
+        }).length}</span>
                         </button>
                     </div>
                     <div className="mt-5">
