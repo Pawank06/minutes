@@ -338,23 +338,36 @@ const TimeSlotForm: React.FC = () => {
               <ArrowLeft className="w-4" /> Go back
             </Button>}
             {currentStep < 3 && (
-              <Button type="button" className="rounded-full" onClick={nextStep}>
+              <Button 
+                type="button" 
+                className="rounded-full" 
+                onClick={nextStep} 
+                disabled={
+                  currentStep === 1 ? !formData.organizationName || !formData.email || !formData.creatorPublicKey || !formData.image :
+                  currentStep === 2 ? !formData.title || !formData.description || !formData.amount || !formData.date :
+                  false
+                }
+              >
                 Next step
               </Button>
             )}
             {currentStep === 3 && (
-              <Button type="submit" className="rounded-full flex items-center gap-2">
+              <Button type="submit" className="rounded-full flex items-center gap-2"
+              disabled={
+                currentStep === 3 ? !formData.time1 || !formData.time2 || !formData.time3 || !formData.meetlink : false
+              }
+              >
                {
                 loader && <Loader className="animate-spin" />
                } Create blink
               </Button>
             )}
-
              {currentStep === 4 && (
               <Button type="button"  onClick={handleNavigate} className="rounded-full">
                 Go to dashboard
               </Button>
             )}
+            
           </div>
         </form>
       </div>
